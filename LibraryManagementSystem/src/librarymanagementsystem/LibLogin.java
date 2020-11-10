@@ -165,6 +165,7 @@ public class LibLogin extends JFrame{
             char[] passResult = passTxt.getPassword();
             String fPass = new String(passResult);
             String fUser = userTxt.getText();
+            String rType =null;
             
             //attributes for MySql
             String Hostname = "localhost";
@@ -178,14 +179,29 @@ public class LibLogin extends JFrame{
             try {
                 Connection dbCon = DriverManager.getConnection(dbUrl,Username,Password);
                 Statement dbStat1 = dbCon.createStatement();
-                String Query1 = "SELECT * FROM testemp WHERE empUsername='"+fUser+"'and empPassword='"+fPass+"'";
+                String Query1 = "SELECT empType FROM employees WHERE empUsername='"+fUser+"'and empPassword='"+fPass+"'";
                 ResultSet rs1 = dbStat1.executeQuery(Query1);
                 if(rs1.next()) {
-                    UIManager.put("OptionPane.messageFont", new Font("Arial",Font.BOLD,25));
-                    JOptionPane.showMessageDialog(null, "Your login credentials are correct\n\t\tRedirceting to Main menu", "Alert!",JOptionPane.INFORMATION_MESSAGE);
-                    dispose();
-                    libMainMenu mainMenu = new libMainMenu();
-                    mainMenu.setVisible(true); 
+                    while(rs1.next()) {
+                        String resultType = rs1.getString("empType");
+                        rType = resultType;
+                    }
+                    
+                    if(rType =="Manager") {
+                    
+                        UIManager.put("OptionPane.messageFont", new Font("Arial",Font.BOLD,25));
+                        JOptionPane.showMessageDialog(null, "Your login credentials are correct\n\t\tRedirceting to Main menu", "Alert!",JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                        LibManagerMain managerMenu = new LibManagerMain();
+                        managerMenu.setVisible(true);
+                    }
+                    else {
+                        UIManager.put("OptionPane.messageFont", new Font("Arial",Font.BOLD,25));
+                        JOptionPane.showMessageDialog(null, "Your login credentials are correct\n\t\tRedirceting to Main menu", "Alert!",JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                        libMainMenu mainMenu = new libMainMenu();
+                        mainMenu.setVisible(true); 
+                    }
                 }
                 else{
                     UIManager.put("OptionPane.messageFont", new Font("Arial",Font.BOLD,25));
