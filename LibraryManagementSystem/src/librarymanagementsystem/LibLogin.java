@@ -1,12 +1,12 @@
 package librarymanagementsystem;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
+import java.sql.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 public class LibLogin extends JFrame{
@@ -53,6 +53,7 @@ public class LibLogin extends JFrame{
         loginBtn = new JButton("Login");
         loginBtn.setFont(new Font("Arial",Font.BOLD,25));
         loginBtn.setBackground(Color.green);
+        loginBtn.addActionListener(new loginBtn()); 
         
         exitBtn = new JButton("Exit ");
         exitBtn.setFont(new Font("Arial",Font.BOLD,25)); 
@@ -152,6 +153,52 @@ public class LibLogin extends JFrame{
             }
         }
     
+    }
+    
+    //login button
+    class loginBtn implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+            //getting results from login form
+            char[] passResult = passTxt.getPassword();
+            String fPass = new String(passResult);
+            String fUser = userTxt.getText();
+            
+            //attributes for MySql
+            String Hostname = "localhost";
+            String Database = "library";
+            String Username = "root";
+            String Password = "Captain@1945!";
+            String dbUrl = "jdbc:mysql://"+Hostname+":3308/"+Database;
+            
+            //Connection to database to get login details
+            //Note if true will be able to log in if false warning message
+            try {
+                Connection dbCon = DriverManager.getConnection(dbUrl,Username,Password);
+                Statement dbStat1 = dbCon.createStatement();
+                String Query1 = "SELECT * FROM testemp WHERE empUsername='"+fUser+"'and empPassword='"+fPass+"'";
+                ResultSet rs1 = dbStat1.executeQuery(Query1);
+                if(rs1.next()) {
+                    UIManager.put("OptionPane.messageFont", new Font("Arial",Font.BOLD,25));
+                    JOptionPane.showMessageDialog(null, "Your login credentials are correct\n\t\tRedirceting to Main menu", "Alert!",JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                    libMainMenu mainMenu = new libMainMenu();
+                    mainMenu.setVisible(true); 
+                }
+                else{
+                    UIManager.put("OptionPane.messageFont", new Font("Arial",Font.BOLD,25));
+                    UIManager.put("OptionPane.buttonFont", new Font("Arial",Font.BOLD,25));
+                    JOptionPane.showMessageDialog(null, "Your username or password was incorrect!\n\t\tPlease Try again!", "Alert!",JOptionPane.ERROR_MESSAGE);
+                    userTxt.setText(null); 
+                    passTxt.setText(null); 
+                }
+            } 
+            catch (SQLException ex) {
+                Logger.getLogger(LibLogin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
 }
